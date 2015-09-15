@@ -1,0 +1,117 @@
+---
+title: "scratch"
+output: html_document
+---
+
+```{r}
+library(phxpml)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+dir <- getwd()
+run004 <- create_pmldb(dir)
+```
+
+
+## dv vs pred
+```{r}
+residual_df <- run004$out$residuals
+dv_vs_preds <- function(residual_df, pred_col = "IPRED") {
+  
+  ggout <- residual_df %>%
+    ggplot(aes_string(x = pred_col, y = "DV")) + 
+  geom_point() + geom_abline(slope = 1, color="red", size = 1.5) +
+  theme_bw()
+  
+  if (length(unique(residual_df$ObsName)) > 1) {
+      ggout <- ggout + facet_wrap(~ObsName)
+  }
+  return(ggout)
+}
+
+
+```
+
+```{r}
+dv_vs_preds(residual_df, pred_col = "PRED")
+```
+
+##  CWRES vs IVAR
+
+```{r}
+res_vs_ivar <- function(residual_df,
+                        res_col = "CWRES",
+                        ivar_col = "IVAR",
+                        loess_central = list("method" = "loess", 
+                                                "group"= NULL, 
+                                                "size" = 1.4, 
+                                                "color" = "red", 
+                                                "se" = FALSE),
+                        loess_spread = list("method" = "loess", 
+                                               "group"= NULL, 
+                                               "size" = 1, 
+                                               "color" = "blue", 
+                                               "se" = FALSE)) {
+    
+    
+   default_loess_central <- list("method" = "loess", 
+                                            "group"= NULL, 
+                                            "size" = 1.4, 
+                                            "color" = "red", 
+                                            "se" = FALSE)
+    default_loess_spread <- list("method" = "loess", 
+                                 "group"= NULL, 
+                                 "size" = 1, 
+                                 "color" = "blue", 
+                                 "se" = FALSE)  
+    
+    
+  ggout <- residual_df %>%
+    ggplot(aes_string(x = ivar_col, y = res_col)) + 
+  geom_point() + 
+  theme_bw() + PKPDmisc::base_theme()
+  
+  if (length(unique(residual_df$ObsName)) > 1) {
+      ggout <- ggout + facet_wrap(~ObsName)
+  }
+  
+  if(!is.null(loess_spread)) {
+    res_col <- lazyeval::as.lazy(res_col)
+      loess_spread <- PKPDmisc::replace_list_elements(default_loess_spread, loess_spread)
+      ggout <- lazyeval::lazy_eval(
+              lazyeval::interp(~ggout + 
+                               stat_smooth(method = loess_spread[["method"]], 
+                                   aes(y = abs(res_col)),
+                                   color = loess_spread[["color"]], 
+                                   size = loess_spread[["size"]], 
+                                   se = loess_spread[["se"]]) + 
+                               stat_smooth(method = loess_spread[["method"]], 
+                                   aes(y = -abs(res_col)),
+                                   color = loess_spread[["color"]], 
+                                   size = loess_spread[["size"]], 
+                                   se = loess_spread[["se"]]), 
+                           res_col = res_col$expr )
+              )
+  }
+  if(!is.null(loess_spread)) {
+  loess_central <- PKPDmisc::replace_list_elements(default_loess_central, loess_central)
+   ggout <- ggout + 
+          stat_smooth(method = loess_central[["method"]], 
+                  color = loess_central[["color"]], 
+                  size = loess_central[["size"]], 
+                  se = loess_central[["se"]]) 
+  }
+  
+  return(ggout)
+}
+
+```
+
+```{r}
+res_vs_ivar(residual_df)
+res_vs_ivar(residual_df, ivar_col = "TAD")
+res_vs_ivar(residual_df, res_col = "IWRES")
+```
+
