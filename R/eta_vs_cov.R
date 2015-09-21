@@ -3,7 +3,6 @@
 #' @details
 #' expects 4 columns Covr (covariate values), Eta (eta values),
 #' CovrName (covariate name), EtaName (name of eta)
-#'
 #' can be accessed from pmldb from `.$EtaCov`
 #' @export
 eta_vs_cov <- function(df) {
@@ -12,7 +11,7 @@ eta_vs_cov <- function(df) {
     dplyr::select(-(ID1:ID4)) %>%
     ggplot(aes(x = Covr, y = Eta)) +
     geom_point() +
-    facet_grid(CovrName~EtaName) +
+    facet_grid(CovrName~EtaName, scales = "free") +
     stat_smooth(se = FALSE, size = 1.25) +
     theme_bw() +
     PKPDmisc::base_theme()

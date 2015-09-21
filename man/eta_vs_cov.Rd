@@ -15,7 +15,6 @@ create Eta vs Covariate plots
 \details{
 expects 4 columns Covr (covariate values), Eta (eta values),
 CovrName (covariate name), EtaName (name of eta)
-
 can be accessed from pmldb from `.$EtaCov`
 }
 
