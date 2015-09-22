@@ -22,8 +22,8 @@ dv_pred_ivar <- function(df) {
 #' @export
 dv_pred_tad <- function(df) {
  ggout <- df %>%
-        dplyr::select(ID5, TAD, PRED, DV, ObsName) %>%
-        ggplot(aes(x = TAD, y = DV, group = ID5)) +
+        dplyr::select(ID5, TAD, PRED, DV, ObsName, WhichDose) %>%
+        ggplot(aes(x = TAD, y = DV, group = interaction(ID5, WhichDose))) +
         geom_line() + geom_point() +
      geom_line(aes(x = TAD, y = PRED), color = "red", size = 1.25) +
      theme_bw() +
