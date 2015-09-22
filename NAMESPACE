@@ -3,6 +3,8 @@
 export("%>%")
 export(convergence_plot)
 export(cov_distributions)
+export(dv_pred_ivar)
+export(dv_pred_tad)
 export(dv_vs_preds)
 export(eta_vs_cov)
 export(eta_vs_eta)
