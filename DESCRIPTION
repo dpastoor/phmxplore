@@ -1,7 +1,7 @@
 Package: phmxplore
 Type: Package
 Title: visualize output of pml and phoenix runs
-Version: 0.1.0
+Version: 0.2.0
 Date: 2015-09-15
 Authors@R: c(
     person("Devin", "Pastoor", , "devin.pastoor@gmail.com", c("aut", "cre"))
